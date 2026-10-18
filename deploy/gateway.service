@@ -1,0 +1,19 @@
+[Unit]
+Description=Edge gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=gateway
+WorkingDirectory=/opt/gateway
+ExecStart=/opt/gateway/.venv/bin/python -m gateway
+Restart=on-failure
+RestartSec=5
+# Hardening: read-only system, writable only where the buffer lives
+ProtectSystem=strict
+ReadWritePaths=/var/lib/gateway
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
