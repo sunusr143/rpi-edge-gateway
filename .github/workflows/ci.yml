@@ -13,3 +13,5 @@ jobs:
           python-version: ${{ matrix.python }}
       - run: python -m unittest discover -s tests -t . -v
       - run: python -m gateway --cycles 12
+      - name: Entrypoint rejects missing configuration
+        run: python -m gateway.run || test $? -eq 2

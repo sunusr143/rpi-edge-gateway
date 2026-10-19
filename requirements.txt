@@ -1,0 +1,3 @@
+# Only needed on a real device. The core logic and the tests use the standard library only.
+paho-mqtt==1.6.1
+pyserial==3.5

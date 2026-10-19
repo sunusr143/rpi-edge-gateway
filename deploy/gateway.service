@@ -1,19 +1,28 @@
 [Unit]
-Description=Edge gateway
+Description=Edge gateway (Modbus to MQTT)
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 User=gateway
+Group=dialout
+# Environment variables are documented in the README (Configuration).
+EnvironmentFile=/etc/gateway/gateway.env
 WorkingDirectory=/opt/gateway
-ExecStart=/opt/gateway/.venv/bin/python -m gateway
+ExecStart=/opt/gateway/.venv/bin/python -m gateway.run
 Restart=on-failure
 RestartSec=5
-# Hardening: read-only system, writable only where the buffer lives
+# Creates /var/lib/gateway owned by the service user; the buffer database lives there.
+StateDirectory=gateway
+# Hardening: read-only system, no new privileges, private /tmp
 ProtectSystem=strict
-ReadWritePaths=/var/lib/gateway
+ProtectHome=true
 NoNewPrivileges=true
 PrivateTmp=true
+ReadWritePaths=/var/lib/gateway
+# Only the serial adapter is exposed
+DevicePolicy=closed
+DeviceAllow=/dev/ttyUSB0 rw
 
 [Install]
 WantedBy=multi-user.target

@@ -1,7 +1,11 @@
 FROM python:3.11-slim
 WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 COPY gateway ./gateway
-# paho-mqtt is only needed for real MQTT publishing
-RUN pip install --no-cache-dir paho-mqtt==1.6.1
-USER nobody
-CMD ["python", "-m", "gateway", "--cycles", "12"]
+# State (the SQLite buffer) must live on a volume so it survives restarts.
+RUN useradd --system --create-home gateway && mkdir -p /var/lib/gateway && chown gateway /var/lib/gateway
+USER gateway
+VOLUME /var/lib/gateway
+# Needs --device /dev/ttyUSB0 and the MQTT_* environment variables at run time.
+CMD ["python", "-m", "gateway.run"]
